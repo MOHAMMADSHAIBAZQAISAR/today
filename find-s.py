@@ -15,3 +15,6 @@ for i in range(4):
             if hypothesis[j]!= h1[j]:
                 hypothesis[j] ='?'
 print(hypothesis)
+
+# expected output: 
+#     ['sunny', 'warm', '?', 'strong', '?', '?']
