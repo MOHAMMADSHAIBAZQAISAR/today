@@ -1,7 +1,7 @@
 
 
 # Open the CSV file
-with open("C:\\Users\\MAHENDER POSHABOINA\\Desktop\\m\\data.csv", "r") as file:
+with open("data.csv", "r") as file:
     lines = file.readlines()
     # Extract the data from the lines 
     data = []
