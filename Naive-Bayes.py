@@ -1,84 +1,56 @@
-# Define the training dataset
-training_data = [
-    ["I love this car", "positive"],
-    ["This view is amazing", "positive"],
-    ["I feel great", "positive"],
-    ["I'm not happy with the product", "negative"],
-    ["This is a terrible place", "negative"],
-    ["I don't like this movie", "negative"]
+class NaiveBayesClassifier:
+    def __init__(self):
+        self.class_counts = {}
+        self.feature_counts = {}
+        self.classes = set()
+
+    def train(self, X, y):
+        for features, label in zip(X, y):
+            self.class_counts[label] = self.class_counts.get(label, 0) + 1
+            for feature in features:
+                if label not in self.feature_counts:
+                    self.feature_counts[label] = {}
+                self.feature_counts[label][feature] = self.feature_counts[label].get(feature, 0) + 1
+                self.classes.add(label)
+
+    def predict(self, X):
+        predictions = []
+        for features in X:
+            max_prob = float('-inf')
+            predicted_class = None
+            for label in self.classes:
+                prob = self.calculate_probability(features, label)
+                if prob > max_prob:
+                    max_prob = prob
+                    predicted_class = label
+            predictions.append(predicted_class)
+        return predictions
+
+    def calculate_probability(self, features, label):
+        probability = 1.0
+        total_count = sum(self.class_counts.values())
+        for feature in features:
+            feature_count = self.feature_counts[label].get(feature, 0)
+            class_count = self.class_counts[label]
+            probability *= (feature_count + 1) / (class_count + total_count)
+        return probability
+
+# Example usage
+X_train = [
+    ["I love this car"],
+    ["This view is amazing"],
+    ["I feel great"],
+    ["I'm not happy with the product"],
+    ["This is a terrible place"],
+    ["I don't like this movie"]
+]
+y_train = ['yes', 'yes', 'yes', 'no', 'no', 'no']
+
+X_test = [
+    ["I like this place"]
 ]
 
-# Create an empty vocabulary set
-vocabulary = set()
-
-# Add words from training data to the vocabulary
-for data in training_data:
-    sentence = data[0]
-    words = sentence.split()
-    vocabulary.update(words)
-
-# Count the occurrences of each class in the training data
-class_counts = {}
-for data in training_data:
-    label = data[1]
-    if label in class_counts:
-        class_counts[label] += 1
-    else:
-        class_counts[label] = 1
-
-# Compute the probabilities of each class
-total_data = len(training_data)
-class_probabilities = {}
-for label, count in class_counts.items():
-    class_probabilities[label] = count / total_data
-
-# Create a dictionary to store word probabilities
-word_probabilities = {}
-
-# Count the occurrences of each word in each class
-word_counts = {}
-for data in training_data:
-    sentence = data[0]
-    label = data[1]
-    words = sentence.split()
-    if label not in word_counts:
-        word_counts[label] = {}
-    for word in words:
-        if word in word_counts[label]:
-            word_counts[label][word] += 1
-        else:
-            word_counts[label][word] = 1
-
-# Compute the probabilities of each word given a class
-for label in word_counts:
-    word_probabilities[label] = {}
-    total_words = sum(word_counts[label].values())
-    for word in vocabulary:
-        if word in word_counts[label]:
-            word_probabilities[label][word] = word_counts[label][word] / total_words
-        else:
-            word_probabilities[label][word] = 0.0
-
-def classify_text(text):
-    words = text.split()
-    # Initialize the class probabilities
-    class_scores = {}
-    for label in class_probabilities:
-        # Start with the class probability
-        score = class_probabilities[label]
-        for word in words:
-            # Check if the word is in the vocabulary
-            if word in vocabulary:
-                # Multiply the score by the word probability
-                score *= word_probabilities[label][word]
-        class_scores[label] = score
-    # Select the class with the highest probability
-    predicted_class = max(class_scores, key=class_scores.get)
-    return predicted_class
-
-# Test the classifier
-test_text = "I like this place"
-predicted_label = classify_text(test_text)
-print("Predicted Label:", predicted_label)
-
-#output: Negative
+nb_classifier = NaiveBayesClassifier()
+nb_classifier.train(X_train, y_train)
+predictions = nb_classifier.predict(X_test)
+print(predictions)
