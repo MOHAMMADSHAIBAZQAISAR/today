@@ -49,6 +49,10 @@ y_train = ['yes', 'yes', 'yes', 'no', 'no', 'no']
 X_test = [
     ["I like this place"]
 ]
+# Preprocess the text data
+X_train = [sentence[0].lower().split() for sentence in X_train]
+X_test = [sentence[0].lower().split() for sentence in X_test]
+
 
 nb_classifier = NaiveBayesClassifier()
 nb_classifier.train(X_train, y_train)
